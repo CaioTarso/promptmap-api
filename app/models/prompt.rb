@@ -11,10 +11,5 @@ class Prompt < ApplicationRecord
 
   has_many_attached :images
 
-  enum prompt_type: {
-    document: 0,
-    image: 1,
-    code: 2,
-    video: 3
-   }
+  enum :prompt_type, { document: 0, image: 1, code: 2, video: 3 }
 end
