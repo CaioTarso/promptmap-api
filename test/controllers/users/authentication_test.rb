@@ -38,6 +38,7 @@ class Users::AuthenticationTest < ActionDispatch::IntegrationTest
            },
            as: :json
 
-    assert_response :no_content
+    assert_response :ok
+    assert_equal "Logged out successfully.", response.parsed_body["message"]
   end
 end
