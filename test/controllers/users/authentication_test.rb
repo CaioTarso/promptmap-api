@@ -41,4 +41,62 @@ class Users::AuthenticationTest < ActionDispatch::IntegrationTest
     assert_response :ok
     assert_equal "Logged out successfully.", response.parsed_body["message"]
   end
+
+
+  test "return current user with jwt token" do
+    post user_session_path,
+         params: {
+           user: {
+             email: users(:one).email,
+             password: "password"
+           }
+         },
+         as: :json
+
+    token = response.headers["Authorization"]
+
+    get "/me",
+        headers: {
+          "Authorization" => token
+        },
+        as: :json
+
+    assert_response :ok
+    assert_equal users(:one).email, response.parsed_body.dig("user", "email")
+  end
+
+
+  test "returns unauthorized without jwt token" do
+    get "/me", as: :json
+
+    assert_response :unauthorized
+    assert_equal "You need to sign in or sign up before continuing.", response.parsed_body["error"]
+  end
+
+  test "updates current user with jwt token" do
+    post user_session_path,
+         params: {
+           user: {
+             email: users(:one).email,
+             password: "password"
+           }
+         },
+         as: :json
+
+    token = response.headers["Authorization"]
+
+    patch "/me",
+          params: {
+            user: {
+              name: "Updated Name"
+            }
+          },
+          headers: {
+            "Authorization" => token
+          },
+          as: :json
+
+    assert_response :ok
+    assert_equal "Updated Name", response.parsed_body.dig("user", "name")
+  end
 end

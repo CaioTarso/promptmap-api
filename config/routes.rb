@@ -14,6 +14,7 @@ Rails.application.routes.draw do
 
 
   get "me", to: "users/me#show"
+  patch "me", to: "users/me#update"
 
   get "up" => "rails/health#show", as: :rails_health_check
 end
