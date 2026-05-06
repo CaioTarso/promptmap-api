@@ -1,7 +1,11 @@
-class Users::SessionsController < Devise::SessionsController
+class Api::V1::Users::SessionsController < Devise::SessionsController
   respond_to :json
 
   private
+
+  def sign_in_params
+    params.require(:user).permit(:email, :password)
+  end
 
   def respond_with(resource, _opts = {})
     render json: {

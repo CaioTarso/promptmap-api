@@ -1,6 +1,6 @@
 require "test_helper"
 
-class Users::AuthenticationTest < ActionDispatch::IntegrationTest
+class ApiV1UsersAuthenticationTest < ActionDispatch::IntegrationTest
   test "signs up and returns a jwt token" do
     post user_registration_path,
          params: {
@@ -55,7 +55,7 @@ class Users::AuthenticationTest < ActionDispatch::IntegrationTest
 
     token = response.headers["Authorization"]
 
-    get "/me",
+    get api_v1_me_path,
         headers: {
           "Authorization" => token
         },
@@ -67,7 +67,7 @@ class Users::AuthenticationTest < ActionDispatch::IntegrationTest
 
 
   test "returns unauthorized without jwt token" do
-    get "/me", as: :json
+    get api_v1_me_path, as: :json
 
     assert_response :unauthorized
     assert_equal "You need to sign in or sign up before continuing.", response.parsed_body["error"]
@@ -85,7 +85,7 @@ class Users::AuthenticationTest < ActionDispatch::IntegrationTest
 
     token = response.headers["Authorization"]
 
-    patch "/me",
+    patch api_v1_me_path,
           params: {
             user: {
               name: "Updated Name"
