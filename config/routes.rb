@@ -16,6 +16,8 @@ Rails.application.routes.draw do
     namespace :v1 do
       get "me", to: "users/me#show"
       patch "me", to: "users/me#update"
+
+      resources :prompts, only: [ :index, :show, :create, :update, :destroy ]
    end
   end
 
