@@ -6,6 +6,10 @@ class Api::V1::PromptsController < ApplicationController
     render json: @prompts
   end
 
+  def mine
+    render json: current_user.prompts
+  end
+
   def show
     @prompt = Prompt.find(params[:id])
     render json: @prompt

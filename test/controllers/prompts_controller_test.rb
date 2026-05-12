@@ -25,6 +25,15 @@ class ApiV1PromptsControllerTest < ActionDispatch::IntegrationTest
     assert_response :ok
   end
 
+  test "should get current user prompts" do
+    get api_v1_my_prompts_path,
+        headers: { "Authorization" => @token },
+        as: :json
+
+    assert_response :ok
+    assert_equal [ prompts(:one).id ], response.parsed_body.map { |prompt| prompt["id"] }
+  end
+
   test "should create prompt" do
     assert_difference("Prompt.count", 1) do
       post api_v1_prompts_path,
