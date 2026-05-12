@@ -7,7 +7,8 @@ class Api::V1::PromptsController < ApplicationController
   end
 
   def mine
-    render json: current_user.prompts
+    @prompts = current_user.prompts
+    render json: @prompts
   end
 
   def show

@@ -23,6 +23,7 @@ class ApiV1PromptsControllerTest < ActionDispatch::IntegrationTest
         as: :json
 
     assert_response :ok
+    assert_not response.parsed_body.first.key?("comments")
   end
 
   test "should get current user prompts" do
@@ -32,6 +33,7 @@ class ApiV1PromptsControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :ok
     assert_equal [ prompts(:one).id ], response.parsed_body.map { |prompt| prompt["id"] }
+    assert_not response.parsed_body.first.key?("comments")
   end
 
   test "should create prompt" do

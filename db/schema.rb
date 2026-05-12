@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_04_213000) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_12_220347) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -42,10 +42,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_04_213000) do
   create_table "comments", force: :cascade do |t|
     t.text "content", null: false
     t.datetime "created_at", null: false
+    t.integer "parent_id"
     t.integer "prompt_id", null: false
     t.datetime "updated_at", null: false
     t.integer "user_id", null: false
     t.index ["created_at"], name: "index_comments_on_created_at"
+    t.index ["parent_id"], name: "index_comments_on_parent_id"
     t.index ["prompt_id"], name: "index_comments_on_prompt_id"
     t.index ["user_id"], name: "index_comments_on_user_id"
   end
@@ -113,6 +115,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_04_213000) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "comments", "comments", column: "parent_id"
   add_foreign_key "comments", "prompts"
   add_foreign_key "comments", "users"
   add_foreign_key "favorites", "prompts"
