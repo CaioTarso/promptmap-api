@@ -49,7 +49,7 @@ class Api::V1::CommentsController < ApplicationController
   def comment_includes
     {
       replies: {
-        only: [ :id, :content, :user_id, :prompt_id, :parent_id, :created_at, :updated_at ]
+        only: [ :id, :content, :user_id, :prompt_id, :parent_id, :comment_likes_count, :created_at, :updated_at ]
       }
     }
   end

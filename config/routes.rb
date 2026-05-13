@@ -22,7 +22,9 @@ Rails.application.routes.draw do
         resources :comments, only: [ :index, :create ]
       end
 
-      resources :comments, only: [ :show, :update, :destroy ]
+      resources :comments, only: [ :show, :update, :destroy ] do
+        resource :like, only: [ :create, :destroy ], controller: "comment_likes"
+      end
    end
   end
 
