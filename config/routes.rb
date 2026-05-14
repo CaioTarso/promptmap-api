@@ -18,7 +18,13 @@ Rails.application.routes.draw do
       patch "me", to: "users/me#update"
       get "me/prompts", to: "prompts#mine", as: :my_prompts
 
-      resources :prompts, only: [ :index, :show, :create, :update, :destroy ]
+      resources :prompts, only: [ :index, :show, :create, :update, :destroy ] do
+        resources :comments, only: [ :index, :create ]
+      end
+
+      resources :comments, only: [ :show, :update, :destroy ] do
+        resource :like, only: [ :create, :destroy ], controller: "comment_likes"
+      end
    end
   end
 
