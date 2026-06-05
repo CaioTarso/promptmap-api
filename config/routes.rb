@@ -17,8 +17,10 @@ Rails.application.routes.draw do
       get "me", to: "users/me#show"
       patch "me", to: "users/me#update"
       get "me/prompts", to: "prompts#mine", as: :my_prompts
+      get "me/favorites", to: "favorites#index", as: :my_favorite_prompts
 
       resources :prompts, only: [ :index, :show, :create, :update, :destroy ] do
+        resource :favorite, only: [ :create, :destroy ], controller: "favorites"
         resources :comments, only: [ :index, :create ]
       end
 
