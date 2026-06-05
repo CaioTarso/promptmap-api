@@ -54,4 +54,44 @@ class ApiV1PromptsControllerTest < ActionDispatch::IntegrationTest
     assert_response :created
     assert_equal "Prompt de teste", response.parsed_body["title"]
   end
+
+  test "should create prompt with tags" do
+    Tag.create!(name: "rails")
+
+    assert_difference("Prompt.count", 1) do
+      assert_difference("Tag.count", 1) do
+        post api_v1_prompts_path,
+             params: {
+               prompt: {
+                 title: "Prompt com tags",
+                 description: "Descricao do prompt",
+                 content: "Conteudo do prompt",
+                 prompt_type: "document",
+                 tag_names: [ "Rails", "AI", "ai", " " ]
+               }
+             },
+             headers: { "Authorization" => @token },
+             as: :json
+      end
+    end
+
+    assert_response :created
+    assert_equal [ "ai", "rails" ], response.parsed_body["tags"].map { |tag| tag["name"] }.sort
+  end
+
+  test "should replace prompt tags on update" do
+    @prompt.tags = [ tags(:one) ]
+
+    patch api_v1_prompt_path(@prompt),
+          params: {
+            prompt: {
+              tag_names: [ "Ruby", "API" ]
+            }
+          },
+          headers: { "Authorization" => @token },
+          as: :json
+
+    assert_response :ok
+    assert_equal [ "api", "ruby" ], response.parsed_body["tags"].map { |tag| tag["name"] }.sort
+  end
 end
