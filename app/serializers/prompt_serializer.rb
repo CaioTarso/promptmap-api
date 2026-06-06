@@ -11,7 +11,7 @@ class PromptSerializer < ActiveModel::Serializer
              :favorited_by_current_user,
              :image_urls
 
-  belongs_to :user
+  belongs_to :user, serializer: UserSerializer
   has_many :tags
 
   def favorited_by_current_user
