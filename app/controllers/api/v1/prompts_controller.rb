@@ -4,17 +4,50 @@ class Api::V1::PromptsController < ApplicationController
   def index
     prompts = Prompt.includes(:user, :tags)
 
-    render json: prompts,
-           each_serializer: PromptSerializer,
-           current_user: current_user
+    prompts = filter_by_search(prompts)
+    prompts = filter_by_tags(prompts)
+    prompts = filter_by_prompt_types(prompts)
+    prompts = filter_by_sort(prompts)
+
+    per_page = [ params.fetch(:per_page, 20).to_i, 100 ].min
+
+    @pagy, prompts = pagy(prompts, limit: per_page)
+
+    render json: {
+      data: ActiveModelSerializers::SerializableResource.new(
+        prompts,
+        each_serializer: PromptSerializer,
+        current_user: current_user
+      ),
+      pagination: {
+        page: @pagy.page,
+        per_page: @pagy.limit,
+        total_pages: @pagy.pages,
+        total_count: @pagy.count
+      }
+    }
   end
 
   def mine
     prompts = current_user.prompts.includes(:user, :tags)
 
-    render json: prompts,
-           each_serializer: PromptSerializer,
-           current_user: current_user
+    per_page = [ params.fetch(:per_page, 20).to_i, 100 ].min
+
+    @pagy, prompts = pagy(prompts, limit: per_page)
+
+    render json: {
+      data: ActiveModelSerializers::SerializableResource.new(
+        prompts,
+        each_serializer: PromptSerializer,
+        current_user: current_user
+      ),
+      pagination: {
+        page: @pagy.page,
+        per_page: @pagy.limit,
+        total_pages: @pagy.pages,
+        total_count: @pagy.count
+      }
+    }
   end
 
   def show
@@ -96,5 +129,38 @@ class Api::V1::PromptsController < ApplicationController
       .map { |name| name.to_s.strip.downcase }
       .reject(&:blank?)
       .uniq
+  end
+
+
+  def filter_by_search(prompts)
+    return prompts if params[:search].blank?
+
+    search = "%#{params[:search]}%"
+
+    prompts.where(
+      "title LIKE :search OR description LIKE :search OR content LIKE :search",
+      search: search
+    )
+  end
+
+  def filter_by_tags(prompts)
+    return prompts if params[:tag].blank?
+
+    prompts.joins(:tags).where(tags: { name: params[:tag] })
+  end
+
+  def filter_by_prompt_types(prompts)
+    return prompts if params[:prompt_type].blank?
+
+    prompts.where(prompt_type: params[:prompt_type])
+  end
+
+  def filter_by_sort(prompts)
+    case params[:sort]
+    when "popular"
+      prompts.order(favorites_count: :desc)
+    else
+      prompts.order(created_at: :desc)
+    end
   end
 end

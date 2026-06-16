@@ -9,6 +9,9 @@ gem "puma", ">= 5.0"
 # Build JSON APIs with ease [https://github.com/rails/jbuilder]
 # gem "jbuilder"
 
+# paginação de resultados
+gem "pagy", "~> 9.3"
+
 gem "devise"
 
 gem "devise-jwt"
