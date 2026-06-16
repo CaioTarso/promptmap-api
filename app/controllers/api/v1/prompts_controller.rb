@@ -9,17 +9,45 @@ class Api::V1::PromptsController < ApplicationController
     prompts = filter_by_prompt_types(prompts)
     prompts = filter_by_sort(prompts)
 
-    render json: prompts,
-           each_serializer: PromptSerializer,
-           current_user: current_user
+    per_page = [ params.fetch(:per_page, 20).to_i, 100 ].min
+
+    @pagy, prompts = pagy(prompts, limit: per_page)
+
+    render json: {
+      data: ActiveModelSerializers::SerializableResource.new(
+        prompts,
+        each_serializer: PromptSerializer,
+        current_user: current_user
+      ),
+      pagination: {
+        page: @pagy.page,
+        per_page: @pagy.limit,
+        total_pages: @pagy.pages,
+        total_count: @pagy.count
+      }
+    }
   end
 
   def mine
     prompts = current_user.prompts.includes(:user, :tags)
 
-    render json: prompts,
-           each_serializer: PromptSerializer,
-           current_user: current_user
+    per_page = [ params.fetch(:per_page, 20).to_i, 100 ].min
+
+    @pagy, prompts = pagy(prompts, limit: per_page)
+
+    render json: {
+      data: ActiveModelSerializers::SerializableResource.new(
+        prompts,
+        each_serializer: PromptSerializer,
+        current_user: current_user
+      ),
+      pagination: {
+        page: @pagy.page,
+        per_page: @pagy.limit,
+        total_pages: @pagy.pages,
+        total_count: @pagy.count
+      }
+    }
   end
 
   def show
@@ -103,7 +131,6 @@ class Api::V1::PromptsController < ApplicationController
       .uniq
   end
 
-  private
 
   def filter_by_search(prompts)
     return prompts if params[:search].blank?
