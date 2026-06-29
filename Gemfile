@@ -16,6 +16,8 @@ gem "devise"
 
 gem "devise-jwt"
 
+gem "rack-cors"
+
 # Serializers for JSON API responses
 gem "active_model_serializers", "~> 0.10.0"
 

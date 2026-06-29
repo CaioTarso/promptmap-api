@@ -60,6 +60,7 @@ class Api::V1::PromptsController < ApplicationController
 
   def create
     attributes = prompt_params
+    normalize_prompt_images(attributes)
 
     prompt = current_user.prompts.build(
       attributes.except(:tag_names)
@@ -80,6 +81,7 @@ class Api::V1::PromptsController < ApplicationController
 
   def update
     attributes = prompt_params
+    normalize_prompt_images(attributes)
 
     prompt = current_user.prompts.find(params[:id])
 
@@ -113,9 +115,21 @@ class Api::V1::PromptsController < ApplicationController
       :description,
       :content,
       :prompt_type,
+      :image,
       images: [],
       tag_names: []
     )
+  end
+
+  def normalize_prompt_images(attributes)
+    images = [
+      attributes.delete(:image),
+      attributes[:images],
+      params[:image],
+      params[:images]
+    ].flatten.compact_blank
+
+    attributes[:images] = images if images.any?
   end
 
   def sync_prompt_tags(prompt, tag_names)
