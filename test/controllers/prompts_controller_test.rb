@@ -53,6 +53,53 @@ class ApiV1PromptsControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :created
     assert_equal "Prompt de teste", response.parsed_body["title"]
+    assert_nil response.parsed_body["thumbnail_url"]
+  end
+
+  test "should create prompt with top-level image upload" do
+    image = fixture_file_upload("test-image.png", "image/png")
+
+    assert_difference("Prompt.count", 1) do
+      post api_v1_prompts_path,
+           params: {
+             prompt: {
+               title: "Prompt com imagem",
+               description: "Descricao do prompt",
+               content: "Conteudo do prompt",
+               prompt_type: "image"
+             },
+             image: image
+           },
+           headers: { "Authorization" => @token }
+    end
+
+    assert_response :created
+    assert_equal 1, Prompt.last.images.count
+    assert_equal 1, response.parsed_body["image_urls"].count
+    assert_equal response.parsed_body["image_urls"].first, response.parsed_body["thumbnail_url"]
+  end
+
+  test "should create prompt with nested images upload" do
+    image = fixture_file_upload("test-image.png", "image/png")
+
+    assert_difference("Prompt.count", 1) do
+      post api_v1_prompts_path,
+           params: {
+             prompt: {
+               title: "Prompt com imagens",
+               description: "Descricao do prompt",
+               content: "Conteudo do prompt",
+               prompt_type: "image",
+               images: [ image ]
+             }
+           },
+           headers: { "Authorization" => @token }
+    end
+
+    assert_response :created
+    assert_equal 1, Prompt.last.images.count
+    assert_equal 1, response.parsed_body["image_urls"].count
+    assert_equal response.parsed_body["image_urls"].first, response.parsed_body["thumbnail_url"]
   end
 
   test "should create prompt with tags" do

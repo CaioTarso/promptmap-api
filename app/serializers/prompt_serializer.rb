@@ -9,6 +9,7 @@ class PromptSerializer < ActiveModel::Serializer
              :created_at,
              :updated_at,
              :favorited_by_current_user,
+             :thumbnail_url,
              :image_urls
 
   belongs_to :user, serializer: UserSerializer
@@ -28,8 +29,12 @@ class PromptSerializer < ActiveModel::Serializer
     object.images.map do |image|
       Rails.application.routes.url_helpers.rails_blob_url(
         image,
-        only_path: false
+        only_path: true
       )
     end
+  end
+
+  def thumbnail_url
+    image_urls.first
   end
 end
