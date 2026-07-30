@@ -6,7 +6,7 @@ class Prompt < ApplicationRecord
 
   has_many :favorited_by, through: :favorites, source: :user
 
-  has_many :prompt_tags
+  has_many :prompt_tags, dependent: :destroy
   has_many :tags, through: :prompt_tags
 
   has_many_attached :images

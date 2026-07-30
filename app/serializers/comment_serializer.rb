@@ -7,15 +7,36 @@ class CommentSerializer < ActiveModel::Serializer
              :comment_likes_count,
              :created_at,
              :updated_at,
-             :liked_by_current_user
+             :liked_by_current_user,
+             :user,
+             :prompt
 
-  has_one :user, serializer: UserSerializer
-  has_one :prompt
   has_many :replies, serializer: CommentSerializer
+
+  def user
+    return unless object.user.present?
+
+    ActiveModelSerializers::SerializableResource.new(
+      object.user,
+      serializer: UserSerializer,
+      current_user: instance_options[:current_user]
+    )
+  end
+
+  def prompt
+    return unless object.prompt.present?
+
+    ActiveModelSerializers::SerializableResource.new(
+      object.prompt,
+      serializer: PromptSerializer,
+      current_user: instance_options[:current_user]
+    )
+  end
 
   def liked_by_current_user
     current_user = instance_options[:current_user]
     return false if current_user.blank?
+
     object.liked_by.include?(current_user)
   end
 end
